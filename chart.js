@@ -13,7 +13,8 @@ const svg = d3.select('body')
     .attr('height', h)
 
 // create path
-const path = d3.geoPath()
+const projection = d3.geoMercator();
+const path = d3.geoPath().projection(projection)
 
 // get data
 d3.queue()
@@ -22,8 +23,37 @@ d3.queue()
     .await(makeMap);
 
 // make the map with the data
-function makeMap(error, us, education) {
+function makeMap(error, world, earthquakes) {
+    d3.json('world.json', function (error, world) {
+        if (error) return console.error(error);
+        console.log(world.features);
+        svg.selectAll("path")
+            .data(world.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .style('fill', 'white')
+            .style('stroke', 'black')
 
+        d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson', function (error, earthquakes) {
+            if (error) return console.error(error);
+            console.log(earthquakes.features);
+            svg.selectAll("circle")
+                .data(earthquakes.features)
+                .enter()
+                .append("circle")
+                .attr("cx", function (d) {
+                    console.log(d.geometry.coordinates)
+                    return projection(d.geometry.coordinates)[0];
+                })
+                .attr("cy", function (d) {
+                    return projection(d.geometry.coordinates)[1];
+                })
+                .attr("r", 5)
+                .style('fill', 'red')
+        });
+
+    });
 
 
 }
