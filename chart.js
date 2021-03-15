@@ -26,7 +26,6 @@ d3.queue()
 function makeMap(error, world, earthquakes) {
     d3.json('world.json', function (error, world) {
         if (error) return console.error(error);
-        console.log(world.features);
         svg.selectAll("path")
             .data(world.features)
             .enter()
@@ -37,13 +36,11 @@ function makeMap(error, world, earthquakes) {
 
         d3.json('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson', function (error, earthquakes) {
             if (error) return console.error(error);
-            console.log(earthquakes.features);
             svg.selectAll("circle")
                 .data(earthquakes.features)
                 .enter()
                 .append("circle")
                 .attr("cx", function (d) {
-                    console.log(d.geometry.coordinates)
                     return projection(d.geometry.coordinates)[0];
                 })
                 .attr("cy", function (d) {
